@@ -60,6 +60,12 @@ body {
   background-color: #f1f1f1;
 }
 
+.scrollbar__track_disabled {}
+
+.scrollbar__track_disabled .scrollbar__thumb {
+  display: none;
+}
+
 .scrollbar__thumb {
   width: 13px;
   margin-left: 2px;

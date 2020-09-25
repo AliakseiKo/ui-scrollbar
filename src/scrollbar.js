@@ -20,9 +20,12 @@ class ScrollBar {
     this.trackStyle = window.getComputedStyle(track);
 
     this.addedSize = 0;
+    this.addedSize = 0;
     this.mouseControl = false;
     this.cachedScrollHeight;
     this.thumbHeight;
+
+    if (this.target.scrollTop === 0) this.target.scrollTop = 1;
 
     this._updateTrackState();
     this._updateButtonsState();
@@ -74,11 +77,17 @@ class ScrollBar {
     this.thumb.style.height = this.thumbHeight + 'px';
 
     this.cachedScrollHeight = this.target.scrollHeight;
+
+    if (this.target.clientHeight === this.target.scrollHeight) {
+      this.track.classList.add('scrollbar__track_disabled');
+    } else {
+      this.track.classList.remove('scrollbar__track_disabled');
+    }
   }
 
   _updateButtonsState() {
     if (this.backButton) {
-      if (this.target.scrollTop === 0) {
+      if (this.target.scrollTop <= 1) {
         this.backButton.classList.add('scrollbar__button_disabled');
       } else {
         this.backButton.classList.remove('scrollbar__button_disabled');
@@ -97,13 +106,15 @@ class ScrollBar {
   _scrollHandler(event) {
     if (this.mouseControl) return;
 
+    if (this.target.scrollTop === 0) this.target.scrollTop = 1;
+
     if (this.target.scrollHeight !== this.cachedScrollHeight) {
       this._updateTrackState();
     }
 
     const matrix = getMatrix(this.thumb);
     matrix[5] = Math.ceil(
-      this.target.scrollTop
+      (this.target.scrollTop - 1)
       / this.target.scrollHeight
       * (parseFloat(this.trackStyle.height) - this.addedSize)
     );
