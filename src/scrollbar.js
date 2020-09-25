@@ -79,17 +79,17 @@ class ScrollBar {
   _updateButtonsState() {
     if (this.backButton) {
       if (this.target.scrollTop === 0) {
-        this.backButton.disabled = true;
+        this.backButton.classList.add('scrollbar__button_disabled');
       } else {
-        this.backButton.disabled = false;
+        this.backButton.classList.remove('scrollbar__button_disabled');
       }
     }
 
     if (this.forwardButton) {
       if (this.target.scrollTop === this.target.scrollHeight - this.target.clientHeight) {
-        this.forwardButton.disabled = true;
+        this.forwardButton.classList.add('scrollbar__button_disabled');
       } else {
-        this.forwardButton.disabled = false;
+        this.forwardButton.classList.remove('scrollbar__button_disabled');
       }
     }
   }
@@ -180,22 +180,21 @@ class ScrollBar {
     }
 
     window.addEventListener('mousemove', mousemove);
-    window.addEventListener('mouseup', mouseup, { once: true });
+    window.addEventListener('mouseup', mouseup, { once: true, capture: true });
   }
 
   _mousedownButtonHandler(sign, event) {
     event.preventDefault();
-    let scrollto = this.target.scrollTop + 40 * sign;
+    if (event.target.classList.contains('scrollbar__button_disabled')) return;
+    let scrollto = this.target.scrollTop;
 
-    this.scrollTo(scrollto);
+    this.scrollTo(scrollto += 40 * sign);
 
     let timeoutId;
 
     const _func = () => {
-      if (event.target.disabled) return;
-      scrollto += 40 * sign;
-      this.scrollTo(scrollto, 50);
-
+      if (event.target.classList.contains('scrollbar__button_disabled')) return;
+      this.scrollTo(scrollto += 40 * sign, 50);
       timeoutId = setTimeout(_func, 50);
     }
 

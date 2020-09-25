@@ -124,11 +124,11 @@ body {
   border-bottom-color: #ffffff;
 }
 
-.scrollbar__button:disabled {
+.scrollbar__button_disabled {
   background-color: #f1f1f1 !important;
 }
 
-.scrollbar__button:disabled::before {
+.scrollbar__button_disabled::before {
   border-top-color: #a3a3a3 !important;
   border-bottom-color: #a3a3a3 !important;
 }
