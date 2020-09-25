@@ -1,0 +1,148 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #8b00ff;
+}
+
+.message-input_wrapper {
+  position: relative;
+  width: 500px;
+}
+
+.message-input-scrollbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollbar__button {
+  position: relative;
+
+  width: 17px;
+  height: 17px;
+  border: none;
+  outline: none;
+
+  background-color: #f1f1f1;
+}
+
+.scrollbar__button::before {
+  content: '';
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  display: block;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+
+
+  transform: translate(-50%, -50%);
+}
+
+.scrollbar__button_back::before {
+  border-bottom: 4px solid #505050;
+}
+
+.scrollbar__button_forward::before {
+  border-top: 4px solid #505050;
+}
+
+.scrollbar__button:hover {
+  background-color: #d2d2d2;
+}
+
+.scrollbar__button:active {
+  background-color: #787878;
+}
+
+.scrollbar__button:active::before {
+  border-top-color: #ffffff;
+  border-bottom-color: #ffffff;
+}
+
+.scrollbar__button:disabled {
+  background-color: #f1f1f1 !important;
+}
+
+.scrollbar__button:disabled::before {
+  border-top-color: #a3a3a3 !important;
+  border-bottom-color: #a3a3a3 !important;
+}
+
+.scrollbar__track {
+  position: relative;
+
+  flex-grow: 1;
+  width: 17px;
+
+  background-color: #f1f1f1;
+}
+
+.scrollbar__thumb {
+  width: 13px;
+  margin-left: 2px;
+
+  background-color: #c1c1c1;
+}
+
+.scrollbar__thumb:hover {
+  background-color: #a8a8a8;
+}
+
+.scrollbar__thumb:active {
+  background-color: #787878;
+}
+
+
+
+
+.message-input2 {
+  margin-top: 10px;
+  width: 100%;
+  resize: none;
+  outline: none;
+  display: block;
+  font: inherit;
+
+overflow-y: scroll;
+
+  height: 200px;
+
+  border-radius: 5px;
+  padding: 10px;
+  /* padding-right: 20px; */
+
+  border: none;
+}
+
+.message-input {
+  width: 100%;
+  resize: none;
+  outline: none;
+  display: block;
+  font: inherit;
+
+  height: 200px;
+
+  border-radius: 5px;
+  padding: 10px;
+  padding-right: 27px;
+
+  border: none;
+}
+
+.message-input::-webkit-scrollbar {
+  width: 0;
+}
+
