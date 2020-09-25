@@ -9,6 +9,8 @@ body {
 .message-input_wrapper {
   position: relative;
   width: 500px;
+
+  margin-bottom: 10px;
 }
 
 .message-input-scrollbar {
@@ -20,6 +22,57 @@ body {
 
   display: flex;
   flex-direction: column;
+}
+
+.message-input {
+  width: 100%;
+  resize: none;
+  outline: none;
+  display: block;
+  font: inherit;
+
+  height: 200px;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.message-input__default-scroll {
+  overflow-y: scroll;
+}
+
+.message-input__custom-scroll {
+  padding-right: 27px;
+}
+
+.message-input__custom-scroll::-webkit-scrollbar {
+  width: 0;
+}
+
+
+
+.scrollbar__track {
+  position: relative;
+
+  flex-grow: 1;
+  width: 17px;
+
+  background-color: #f1f1f1;
+}
+
+.scrollbar__thumb {
+  width: 13px;
+  margin-left: 2px;
+
+  background-color: #c1c1c1;
+}
+
+.scrollbar__thumb:hover {
+  background-color: #a8a8a8;
+}
+
+.scrollbar__thumb:active {
+  background-color: #787878;
 }
 
 .scrollbar__button {
@@ -79,70 +132,3 @@ body {
   border-top-color: #a3a3a3 !important;
   border-bottom-color: #a3a3a3 !important;
 }
-
-.scrollbar__track {
-  position: relative;
-
-  flex-grow: 1;
-  width: 17px;
-
-  background-color: #f1f1f1;
-}
-
-.scrollbar__thumb {
-  width: 13px;
-  margin-left: 2px;
-
-  background-color: #c1c1c1;
-}
-
-.scrollbar__thumb:hover {
-  background-color: #a8a8a8;
-}
-
-.scrollbar__thumb:active {
-  background-color: #787878;
-}
-
-
-
-
-.message-input2 {
-  margin-top: 10px;
-  width: 100%;
-  resize: none;
-  outline: none;
-  display: block;
-  font: inherit;
-
-overflow-y: scroll;
-
-  height: 200px;
-
-  border-radius: 5px;
-  padding: 10px;
-  /* padding-right: 20px; */
-
-  border: none;
-}
-
-.message-input {
-  width: 100%;
-  resize: none;
-  outline: none;
-  display: block;
-  font: inherit;
-
-  height: 200px;
-
-  border-radius: 5px;
-  padding: 10px;
-  padding-right: 27px;
-
-  border: none;
-}
-
-.message-input::-webkit-scrollbar {
-  width: 0;
-}
-
