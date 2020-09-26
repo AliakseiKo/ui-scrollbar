@@ -5,7 +5,10 @@ class ScrollBar {
     backButton,
     forwardButton,
     selector = '.scrollbar__thumb',
-    minThumbSize = 17
+    trackDisabledClass = 'scrollbar__track_disabled',
+    buttonDisabledClass = 'scrollbar__button_disabled',
+    minThumbSize = 17,
+    horizontal = false
   } = {}) {
     this.SCROLL_STEP_RATIO = 0.875;
 
@@ -14,18 +17,22 @@ class ScrollBar {
     this.thumb = track.querySelector(selector);
     this.backButton = backButton;
     this.forwardButton = forwardButton;
-
+    this.trackDisabledClass = trackDisabledClass;
+    this.buttonDisabledClass = buttonDisabledClass;
     this.minThumbSize = minThumbSize;
+    this.horizontal = horizontal;
 
     this.trackStyle = window.getComputedStyle(track);
 
     this.addedSize = 0;
-    this.addedSize = 0;
     this.mouseControl = false;
     this.cachedScrollHeight;
-    this.thumbHeight;
+    this.thumbSize;
 
-    if (this.target.scrollTop === 0) this.target.scrollTop = 1;
+    this.matrixIndex = (this.horizontal) ? 4 : 5;
+    this.eventAxis = (this.horizontal) ? 'clientX' : 'clientY';
+
+    if (this.scrollOffset === 0) this.scrollOffset = 1;
 
     this._updateTrackState();
     this._updateButtonsState();
@@ -49,6 +56,36 @@ class ScrollBar {
     }
   }
 
+  get scrollOffset() {
+    return (this.horizontal) ? this.target.scrollLeft : this.target.scrollTop;
+  }
+
+  set scrollOffset(value) {
+    if (this.horizontal) this.target.scrollLeft = value;
+    else this.target.scrollTop = value;
+  }
+
+  get clientSize() {
+    return (this.horizontal) ? this.target.clientWidth : this.target.clientHeight;
+  }
+
+  get scrollSize() {
+    return (this.horizontal) ? this.target.scrollWidth : this.target.scrollHeight;
+  }
+
+  get trackSize() {
+    return (this.horizontal) ? parseFloat(this.trackStyle.width) :  parseFloat(this.trackStyle.height);
+  }
+
+  get thumbSize() {
+    return this.cachedThumbSize;
+  }
+
+  set thumbSize(value) {
+    if (this.horizontal) this.thumb.style.width = value + 'px';
+    else this.thumb.style.height = value + 'px';
+  }
+
   destructor() {
     this.target.removeEventListener('scroll', this._scrollHandler);
     this.track.removeEventListener('mousedown', this._mousedownTrackHandler);
@@ -61,44 +98,40 @@ class ScrollBar {
   }
 
   _updateTrackState() {
-    this.thumbHeight = Math.floor(
-      this.target.clientHeight
-        / this.target.scrollHeight
-        * parseFloat(this.trackStyle.height)
-    );
+    this.cachedThumbSize = Math.floor(this.clientSize / this.scrollSize * this.trackSize);
 
-    if (this.thumbHeight < this.minThumbSize) {
-      this.addedSize = this.minThumbSize - this.thumbHeight;
-      this.thumbHeight = this.minThumbSize;
+    if (this.cachedThumbSize < this.minThumbSize) {
+      this.addedSize = this.minThumbSize - this.cachedThumbSize;
+      this.cachedThumbSize = this.minThumbSize;
     } else {
       this.addedSize = 0;
     }
 
-    this.thumb.style.height = this.thumbHeight + 'px';
+    this.thumbSize = this.cachedThumbSize;
 
     this.cachedScrollHeight = this.target.scrollHeight;
 
-    if (this.target.clientHeight === this.target.scrollHeight) {
-      this.track.classList.add('scrollbar__track_disabled');
+    if (this.clientSize === this.scrollSize) {
+      this.track.classList.add(this.trackDisabledClass);
     } else {
-      this.track.classList.remove('scrollbar__track_disabled');
+      this.track.classList.remove(this.trackDisabledClass);
     }
   }
 
   _updateButtonsState() {
     if (this.backButton) {
-      if (this.target.scrollTop <= 1) {
-        this.backButton.classList.add('scrollbar__button_disabled');
+      if (this.scrollOffset <= 1) {
+        this.backButton.classList.add(this.buttonDisabledClass);
       } else {
-        this.backButton.classList.remove('scrollbar__button_disabled');
+        this.backButton.classList.remove(this.buttonDisabledClass);
       }
     }
 
     if (this.forwardButton) {
-      if (this.target.scrollTop === this.target.scrollHeight - this.target.clientHeight) {
-        this.forwardButton.classList.add('scrollbar__button_disabled');
+      if (this.scrollOffset === this.scrollSize - this.clientSize) {
+        this.forwardButton.classList.add(this.buttonDisabledClass);
       } else {
-        this.forwardButton.classList.remove('scrollbar__button_disabled');
+        this.forwardButton.classList.remove(this.buttonDisabledClass);
       }
     }
   }
@@ -106,18 +139,15 @@ class ScrollBar {
   _scrollHandler(event) {
     if (this.mouseControl) return;
 
-    if (this.target.scrollTop === 0) this.target.scrollTop = 1;
+    if (this.scrollOffset === 0) this.scrollOffset = 1;
 
-    if (this.target.scrollHeight !== this.cachedScrollHeight) {
+    if (this.scrollSize !== this.cachedScrollHeight) {
       this._updateTrackState();
     }
 
     const matrix = getMatrix(this.thumb);
-    matrix[5] = Math.ceil(
-      (this.target.scrollTop - 1)
-      / this.target.scrollHeight
-      * (parseFloat(this.trackStyle.height) - this.addedSize)
-    );
+    matrix[this.matrixIndex] =
+      Math.ceil((this.scrollOffset - 1) / this.scrollSize * (this.trackSize - this.addedSize));
     setMatrix(this.thumb, matrix);
 
     this._updateButtonsState();
@@ -127,9 +157,9 @@ class ScrollBar {
     event.preventDefault();
     this.mouseControl = true;
 
-    const mousedownPos = event.clientY;
+    const mousedownPos = event[this.eventAxis];
     const scrollThumbMatrix = getMatrix(this.thumb);
-    const scrollThumbPos = scrollThumbMatrix[5];
+    const scrollThumbPos = scrollThumbMatrix[this.matrixIndex];
 
     const mousemove = this._mousemoveHandler.bind(this, mousedownPos, scrollThumbPos, scrollThumbMatrix);
     const mouseup = this._mouseupHandler.bind(this, mousemove);
@@ -141,22 +171,20 @@ class ScrollBar {
   _mousemoveHandler(mousedownPos, scrollThumbPos, scrollThumbMatrix, event) {
     event.preventDefault();
 
-    let current = scrollThumbPos - mousedownPos + event.clientY;
+    let current = scrollThumbPos - mousedownPos + event[this.eventAxis];
 
-    const maxOffset = parseFloat(this.trackStyle.height) - this.thumbHeight;
+    const maxOffset = this.trackSize - this.thumbSize;
     if (current < 0) {
       current = 0;
     } else if (current > maxOffset) {
       current = maxOffset;
     }
 
-    scrollThumbMatrix[5] = current;
+    scrollThumbMatrix[this.matrixIndex] = current;
 
     setMatrix(this.thumb, scrollThumbMatrix);
 
-    this.target.scrollTop = current
-      / (parseFloat(this.trackStyle.height) - this.addedSize)
-      * this.target.scrollHeight;
+    this.scrollOffset = current / (this.trackSize - this.addedSize) * this.scrollSize || 1;
 
     this._updateButtonsState();
   }
@@ -169,8 +197,9 @@ class ScrollBar {
   }
 
   _mousedownTrackHandler(event) {
+    if (event.target !== event.currentTarget) return;
     event.preventDefault();
-    let current = event.clientY;
+    let current = event[this.eventAxis];
 
     this._scrollByStep(current, 150);
 
@@ -182,7 +211,7 @@ class ScrollBar {
     let timeoutId = setTimeout(func, 500);
 
     const mousemove = (event) => {
-      current = event.clientY;
+      current = event[this.eventAxis];
     }
 
     const mouseup = (event) => {
@@ -191,20 +220,20 @@ class ScrollBar {
     }
 
     window.addEventListener('mousemove', mousemove);
-    window.addEventListener('mouseup', mouseup, { once: true, capture: true });
+    window.addEventListener('mouseup', mouseup, { once: true });
   }
 
   _mousedownButtonHandler(sign, event) {
     event.preventDefault();
-    if (event.target.classList.contains('scrollbar__button_disabled')) return;
-    let scrollto = this.target.scrollTop;
+    if (event.target.classList.contains(this.buttonDisabledClass)) return;
+    let scrollto = this.scrollOffset;
 
     this.scrollTo(scrollto += 40 * sign);
 
     let timeoutId;
 
     const _func = () => {
-      if (event.target.classList.contains('scrollbar__button_disabled')) return;
+      if (event.target.classList.contains(this.buttonDisabledClass)) return;
       this.scrollTo(scrollto += 40 * sign, 50);
       timeoutId = setTimeout(_func, 50);
     }
@@ -216,7 +245,7 @@ class ScrollBar {
   }
 
   _scrollByStep(y, duration) {
-    const scrollTop = this.target.scrollTop;
+    const scrollTop = this.scrollOffset;
     const thumbCoords = this.thumb.getBoundingClientRect();
 
     let sign;
@@ -229,18 +258,18 @@ class ScrollBar {
       return;
     }
 
-    const scrollStep = this.SCROLL_STEP_RATIO * this.target.clientHeight * sign;
+    const scrollStep = this.SCROLL_STEP_RATIO * this.clientSize * sign;
 
     this.scrollTo(scrollTop + scrollStep, duration);
   }
 
   scrollTo(y, duration = 150) {
-    const scrollTop = this.target.scrollTop;
+    const scrollTop = this.scrollOffset;
     const offset = y - scrollTop;
 
     animate({
       draw: (progress) => {
-        this.target.scrollTop = scrollTop + offset * progress;
+        this.scrollOffset = scrollTop + offset * progress;
       },
       duration
     });

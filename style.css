@@ -13,17 +13,6 @@ body {
   margin-bottom: 10px;
 }
 
-.message-input-scrollbar {
-  position: absolute;
-  top: 0;
-  right: 0;
-
-  height: 100%;
-
-  display: flex;
-  flex-direction: column;
-}
-
 .message-input {
   width: 100%;
   resize: none;
@@ -37,23 +26,60 @@ body {
   padding: 10px;
 }
 
-.message-input__default-scroll {
+
+
+.message-input_default-scroll_vertical {
   overflow-y: scroll;
 }
 
-.message-input__custom-scroll {
+.message-input_default-scroll_horizontal {
+  white-space: nowrap;
+  overflow-x: scroll;
+}
+
+.message-input_custom-scroll_vertical {
   padding-right: 27px;
 }
 
-.message-input__custom-scroll::-webkit-scrollbar {
+.message-input_custom-scroll_vertical::-webkit-scrollbar {
   width: 0;
+}
+
+.message-input_custom-scroll_horizontal {
+  white-space: nowrap;
+  padding-bottom: 27px;
+}
+
+.message-input_custom-scroll_horizontal::-webkit-scrollbar {
+  height: 0;
+}
+
+
+
+.message-input__scrollbar {
+  position: absolute;
+
+  display: flex;
+}
+
+.message-input__scrollbar_vertical {
+  top: 0;
+  right: 0;
+
+  flex-direction: column;
+  height: 100%;
+}
+
+.message-input__scrollbar_horizontal {
+  bottom: 0;
+  left: 0;
+
+  width: 100%;
 }
 
 
 
 .scrollbar__track {
-  position: relative;
-
   flex-grow: 1;
   width: 17px;
 
@@ -67,9 +93,6 @@ body {
 }
 
 .scrollbar__thumb {
-  width: 13px;
-  margin-left: 2px;
-
   background-color: #c1c1c1;
 }
 
@@ -79,6 +102,16 @@ body {
 
 .scrollbar__thumb:active {
   background-color: #787878;
+}
+
+.scrollbar__thumb_vertical {
+  width: 13px;
+  margin-left: 2px;
+}
+
+.scrollbar__thumb_horizontal {
+  height: 13px;
+  margin-top: 2px;
 }
 
 .scrollbar__button {
@@ -102,39 +135,77 @@ body {
   display: block;
   width: 0;
   height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-
+  border: 4px solid transparent;
 
   transform: translate(-50%, -50%);
 }
 
-.scrollbar__button_back::before {
+.scrollbar__button_top::before {
+  border-top: none;
   border-bottom: 4px solid #505050;
 }
 
-.scrollbar__button_forward::before {
+.scrollbar__button_bottom::before {
+  border-bottom: none;
   border-top: 4px solid #505050;
 }
+
+.scrollbar__button_left::before {
+  border-left: none;
+  border-right: 4px solid #505050;
+}
+
+.scrollbar__button_right::before {
+  border-right: none;
+  border-left: 4px solid #505050;
+}
+
+/* hover button */
 
 .scrollbar__button:hover {
   background-color: #d2d2d2;
 }
 
+/* active button */
+
 .scrollbar__button:active {
   background-color: #787878;
 }
 
-.scrollbar__button:active::before {
-  border-top-color: #ffffff;
+.scrollbar__button_top:active::before {
   border-bottom-color: #ffffff;
 }
+
+.scrollbar__button_bottom:active::before {
+  border-top-color: #ffffff;
+}
+
+.scrollbar__button_left:active::before {
+  border-right-color: #ffffff;
+}
+
+.scrollbar__button_right:active::before {
+  border-left-color: #ffffff;
+}
+
+/* disabled button */
 
 .scrollbar__button_disabled {
   background-color: #f1f1f1 !important;
 }
 
-.scrollbar__button_disabled::before {
-  border-top-color: #a3a3a3 !important;
+.scrollbar__button_disabled.scrollbar__button_top::before {
   border-bottom-color: #a3a3a3 !important;
+}
+
+.scrollbar__button_disabled.scrollbar__button_bottom::before {
+  border-top-color: #a3a3a3 !important;
+}
+
+.scrollbar__button_disabled.scrollbar__button_left::before {
+  border-right-color: #a3a3a3 !important;
+}
+
+.scrollbar__button_disabled.scrollbar__button_right::before {
+  border-left-color: #a3a3a3 !important;
 }
