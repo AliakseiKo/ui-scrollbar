@@ -11,7 +11,7 @@
   "main": "./dist/scrollbar.min.js",
   "scripts": {
     "build": "rollup -c",
-    "dev": "rollup -c -w ./src/"
+    "dev": "rollup -c -w ./src/ -m inline"
   },
   "author": {
     "name": "AliakseiKo",
